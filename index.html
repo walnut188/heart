@@ -2,91 +2,182 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>温馨提示</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>匿名的信</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        body {
-            background-color: #000;
+        html, body {
+            background-color: #ffeef2; /* 浅粉色背景，更有氛围感 */
             overflow: hidden;
             height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
+
+        /* 窗口整体 */
         .tip-window {
             position: absolute;
-            width: 300px;
-            height: 80px;
+            width: 240px;
+            min-height: 100px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+            overflow: hidden;
+            animation: fadeOut 15s forwards;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 窗口标题栏 */
+        .tip-header {
+            background-color: #f8f8f8;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+        }
+        .tip-title {
+            font-size: 14px;
+            color: #ff6b81;
+            font-weight: bold;
+        }
+        .close-btn {
+            width: 20px;
+            height: 20px;
+            background-color: #eee;
+            border-radius: 50%;
+            border: none;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 20px;
-            font-family: "微软雅黑", sans-serif;
-            font-size: 18px;
-            text-align: center;
-            border-radius: 4px;
-            animation: fadeOut 10s forwards;
-            word-break: break-all;
+            padding: 0;
+            line-height: 1;
         }
+        .close-btn:hover {
+            background-color: #ff6b81;
+            color: white;
+        }
+
+        /* 窗口内容 */
+        .tip-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, "微软雅黑", sans-serif;
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            background-color: #fff;
+        }
+
         @keyframes fadeOut {
-            0% { opacity: 1; }
+            0% { opacity: 1; transform: scale(0.8); }
+            10% { opacity: 1; transform: scale(1); }
             90% { opacity: 1; }
-            100% { opacity: 0; }
+            100% { opacity: 0; transform: scale(0.9); }
+        }
+
+        /* 花瓣特效 */
+        .petal {
+            position: fixed;
+            top: -10px;
+            width: 15px;
+            height: 15px;
+            background: #ffb6c1;
+            border-radius: 50% 0 50% 50%;
+            transform: rotate(45deg);
+            opacity: 0.7;
+            animation: fall linear forwards;
+            pointer-events: none;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(405deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
     <script>
-        // 提示语列表（和原代码一致）
+        // 文案列表（和视频风格一致）
         const tips = [
-            '考研一战上岸', '考公顺利上岸', '实验一次成功',
-            '答辩轻松通过', '绩点稳居前列', '奖学金轻松拿',
-            '科研灵感爆发', '课题顺利结题', '转码成功上岸',
-            '中顶刊顶会', '学的都考', '面试题都会',
-            '大厂offer到手', '别熬夜', '年薪百万',
-            '梦想成真', '保持好心情', '拥有传送门',
-            '天天开心', '你是最棒的', '一定会越来越好'
+            '保持好心情~', '天冷了，多穿衣服~', '顺顺利利~',
+            '期待下一次见面~', '早点休息~', '今天过得开心嘛~',
+            '梦想成真~', '你超棒的！', '今天也要加油呀~',
+            '别忘了吃晚饭~', '少熬夜，多爱自己~', '万事胜意~',
+            '平安喜乐~', '被人惦记的感觉真好~', '愿你天天开心~'
         ];
 
-        // 背景色列表（和原代码一致）
-        const bgColors = [
-            'lightpink', 'skyblue', 'lightgreen', 'lavender',
-            'lightyellow', 'plum', 'coral', 'bisque', 'aquamarine',
-            'mistyrose', 'honeydew', 'lavenderblush', 'oldlace',
-            'palegoldenrod', 'powderblue', 'rosybrown', 'seashell'
-        ];
+        const sw = window.innerWidth;
+        const sh = window.innerHeight;
+        const windowWidth = 240;
+        const windowMinHeight = 100;
+        const totalWindows = 40; // 控制数量，手机上不拥挤
 
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const windowWidth = 300;
-        const windowHeight = 80;
-        const totalWindows = 200;
-
-        // 创建提示窗口
+        // 创建窗口
         function createTipWindow() {
             const tip = tips[Math.floor(Math.random() * tips.length)];
-            const bg = bgColors[Math.floor(Math.random() * bgColors.length)];
-            const x = Math.floor(Math.random() * (screenWidth - windowWidth));
-            const y = Math.floor(Math.random() * (screenHeight - windowHeight));
+            const x = Math.floor(Math.random() * (sw - windowWidth));
+            const y = Math.floor(Math.random() * (sh - windowMinHeight));
 
             const windowEl = document.createElement('div');
             windowEl.className = 'tip-window';
             windowEl.style.left = `${x}px`;
             windowEl.style.top = `${y}px`;
-            windowEl.style.backgroundColor = bg;
-            windowEl.innerText = tip;
 
+            // 标题栏
+            const header = document.createElement('div');
+            header.className = 'tip-header';
+            header.innerHTML = `
+                <span class="tip-title">💖温馨提示</span>
+                <button class="close-btn">×</button>
+            `;
+
+            // 内容区
+            const content = document.createElement('div');
+            content.className = 'tip-content';
+            content.innerText = tip;
+
+            // 关闭按钮事件
+            header.querySelector('.close-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                windowEl.remove();
+            });
+
+            windowEl.appendChild(header);
+            windowEl.appendChild(content);
             document.body.appendChild(windowEl);
 
-            // 10秒后自动关闭（和原代码的 10000ms 一致）
+            // 15秒后自动消失
             setTimeout(() => {
                 windowEl.remove();
-            }, 10000);
+            }, 15000);
         }
 
-        // 批量生成窗口
+        // 飘落花瓣
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.style.left = `${Math.random() * 100}vw`;
+            petal.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 10000);
+        }
+
+        // 开始生成窗口
         function startWarmTips() {
             let count = 0;
             const interval = setInterval(() => {
@@ -96,18 +187,23 @@
                 }
                 createTipWindow();
                 count++;
-            }, 5); // 和原代码的 0.005s 间隔一致
+            }, 250);
         }
 
-        // 按空格键关闭所有窗口（和原代码的功能一致）
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                document.querySelectorAll('.tip-window').forEach(el => el.remove());
-            }
+        // 开始花瓣
+        function startPetals() {
+            setInterval(createPetal, 400);
+        }
+
+        // 触摸屏幕关闭所有窗口
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.classList.contains('close-btn')) return;
+            document.querySelectorAll('.tip-window').forEach(el => el.remove());
         });
 
-        // 开始生成
+        // 启动
         startWarmTips();
+        startPetals();
     </script>
 </body>
 </html>
