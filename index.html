@@ -3,99 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>爱心便签墙</title>
+    <title>温馨提示</title>
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            background-color: #000;
+            box-sizing: border-box;
         }
-        .note {
+        body {
+            background-color: #000;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .tip-window {
             position: absolute;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
             font-family: "微软雅黑", sans-serif;
-            color: #333;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 4px;
+            animation: fadeOut 10s forwards;
             word-break: break-all;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
         }
     </style>
 </head>
 <body>
     <script>
-        // 提示语列表
+        // 提示语列表（和原代码一致）
         const tips = [
-            "好好吃饭", "好好爱自己", "保持好心情", "别熬夜", "顺顺利利",
-            "我想你了", "多喝水哦~", "为了学党史", "早睡早起", "天天开心"
+            '考研一战上岸', '考公顺利上岸', '实验一次成功',
+            '答辩轻松通过', '绩点稳居前列', '奖学金轻松拿',
+            '科研灵感爆发', '课题顺利结题', '转码成功上岸',
+            '中顶刊顶会', '学的都考', '面试题都会',
+            '大厂offer到手', '别熬夜', '年薪百万',
+            '梦想成真', '保持好心情', '拥有传送门',
+            '天天开心', '你是最棒的', '一定会越来越好'
         ];
-        // 颜色列表
-        const colors = ["#FFB6C1", "#B0E0E6", "#90EE90", "#FFA500", "#FF69B4"];
 
-        // 屏幕宽度和高度
-        const sw = window.innerWidth;
-        const sh = window.innerHeight;
+        // 背景色列表（和原代码一致）
+        const bgColors = [
+            'lightpink', 'skyblue', 'lightgreen', 'lavender',
+            'lightyellow', 'plum', 'coral', 'bisque', 'aquamarine',
+            'mistyrose', 'honeydew', 'lavenderblush', 'oldlace',
+            'palegoldenrod', 'powderblue', 'rosybrown', 'seashell'
+        ];
 
-        // 创建便签函数
-        function createNote(x, y, tip) {
-            const note = document.createElement('div');
-            note.className = 'note';
-            note.style.left = `${x}px`;
-            note.style.top = `${y}px`;
-            note.style.backgroundColor = randomColor();
-            note.style.width = `${120 + Math.random() * 80}px`;
-            note.style.height = `${30 + Math.random() * 40}px`;
-            note.innerText = tip;
-            document.body.appendChild(note);
-            return note;
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const windowWidth = 300;
+        const windowHeight = 80;
+        const totalWindows = 200;
+
+        // 创建提示窗口
+        function createTipWindow() {
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const bg = bgColors[Math.floor(Math.random() * bgColors.length)];
+            const x = Math.floor(Math.random() * (screenWidth - windowWidth));
+            const y = Math.floor(Math.random() * (screenHeight - windowHeight));
+
+            const windowEl = document.createElement('div');
+            windowEl.className = 'tip-window';
+            windowEl.style.left = `${x}px`;
+            windowEl.style.top = `${y}px`;
+            windowEl.style.backgroundColor = bg;
+            windowEl.innerText = tip;
+
+            document.body.appendChild(windowEl);
+
+            // 10秒后自动关闭（和原代码的 10000ms 一致）
+            setTimeout(() => {
+                windowEl.remove();
+            }, 10000);
         }
 
-        // 随机颜色
-        function randomColor() {
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        // 随机提示语
-        function randomTip() {
-            return tips[Math.floor(Math.random() * tips.length)];
-        }
-
-        // 生成爱心形状的便签
-        function generateHeart() {
-            let t = 0;
-            const interval = setInterval(() => {
-                if (t > 100) {
-                    clearInterval(interval);
-                    generateFullScreen();
-                    return;
-                }
-                const theta = t / 100 * 2 * Math.PI;
-                const x = 16 * Math.pow(Math.sin(theta), 3);
-                const y = 13 * Math.cos(theta) - 5 * Math.cos(2 * theta) - 2 * Math.cos(3 * theta) - Math.cos(4 * theta);
-                const posX = sw / 2 + x * 15;
-                const posY = sh / 2 - y * 15;
-                createNote(posX, posY, randomTip());
-                t++;
-            }, 50);
-        }
-
-        // 生成满屏便签
-        function generateFullScreen() {
+        // 批量生成窗口
+        function startWarmTips() {
             let count = 0;
             const interval = setInterval(() => {
-                if (count > 100) {
+                if (count >= totalWindows) {
                     clearInterval(interval);
                     return;
                 }
-                const x = Math.random() * (sw - 200);
-                const y = Math.random() * (sh - 80);
-                createNote(x, y, randomTip());
+                createTipWindow();
                 count++;
-            }, 100);
+            }, 5); // 和原代码的 0.005s 间隔一致
         }
 
+        // 按空格键关闭所有窗口（和原代码的功能一致）
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                document.querySelectorAll('.tip-window').forEach(el => el.remove());
+            }
+        });
+
         // 开始生成
-        generateHeart();
+        startWarmTips();
     </script>
 </body>
 </html>
