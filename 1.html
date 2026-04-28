@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱心便签墙</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .note {
+            position: absolute;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            font-family: "微软雅黑", sans-serif;
+            color: #333;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 提示语列表
+        const tips = [
+            "好好吃饭", "好好爱自己", "保持好心情", "别熬夜", "顺顺利利",
+            "我想你了", "多喝水哦~", "为了学党史", "早睡早起", "天天开心"
+        ];
+        // 颜色列表
+        const colors = ["#FFB6C1", "#B0E0E6", "#90EE90", "#FFA500", "#FF69B4"];
+
+        // 屏幕宽度和高度
+        const sw = window.innerWidth;
+        const sh = window.innerHeight;
+
+        // 创建便签函数
+        function createNote(x, y, tip) {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.style.left = `${x}px`;
+            note.style.top = `${y}px`;
+            note.style.backgroundColor = randomColor();
+            note.style.width = `${120 + Math.random() * 80}px`;
+            note.style.height = `${30 + Math.random() * 40}px`;
+            note.innerText = tip;
+            document.body.appendChild(note);
+            return note;
+        }
+
+        // 随机颜色
+        function randomColor() {
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // 随机提示语
+        function randomTip() {
+            return tips[Math.floor(Math.random() * tips.length)];
+        }
+
+        // 生成爱心形状的便签
+        function generateHeart() {
+            let t = 0;
+            const interval = setInterval(() => {
+                if (t > 100) {
+                    clearInterval(interval);
+                    generateFullScreen();
+                    return;
+                }
+                const theta = t / 100 * 2 * Math.PI;
+                const x = 16 * Math.pow(Math.sin(theta), 3);
+                const y = 13 * Math.cos(theta) - 5 * Math.cos(2 * theta) - 2 * Math.cos(3 * theta) - Math.cos(4 * theta);
+                const posX = sw / 2 + x * 15;
+                const posY = sh / 2 - y * 15;
+                createNote(posX, posY, randomTip());
+                t++;
+            }, 50);
+        }
+
+        // 生成满屏便签
+        function generateFullScreen() {
+            let count = 0;
+            const interval = setInterval(() => {
+                if (count > 100) {
+                    clearInterval(interval);
+                    return;
+                }
+                const x = Math.random() * (sw - 200);
+                const y = Math.random() * (sh - 80);
+                createNote(x, y, randomTip());
+                count++;
+            }, 100);
+        }
+
+        // 开始生成
+        generateHeart();
+    </script>
+</body>
+</html>
