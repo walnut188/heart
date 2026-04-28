@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>匿名的信</title>
+    <title></title>
     <style>
         * {
             margin: 0;
@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
         html, body {
-            background-color: #ffeef2; /* 浅粉色背景，更有氛围感 */
+            background-color: #ffffff;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
@@ -20,76 +20,66 @@
             left: 0;
         }
 
-        /* 窗口整体 */
+        /* 1:1还原视频里的文字框样式 */
         .tip-window {
             position: absolute;
-            width: 240px;
-            min-height: 100px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+            width: 260px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             overflow: hidden;
-            animation: fadeOut 15s forwards;
+            animation: fadeOut 18s forwards;
             display: flex;
             flex-direction: column;
         }
 
-        /* 窗口标题栏 */
+        /* 标题栏：💖温馨提示 + 关闭按钮 */
         .tip-header {
             background-color: #f8f8f8;
-            padding: 8px 12px;
+            padding: 6px 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #ddd;
         }
         .tip-title {
             font-size: 14px;
-            color: #ff6b81;
-            font-weight: bold;
+            color: #333;
         }
         .close-btn {
-            width: 20px;
-            height: 20px;
-            background-color: #eee;
-            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            background: none;
             border: none;
-            font-size: 14px;
+            font-size: 16px;
             color: #666;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
             line-height: 1;
-        }
-        .close-btn:hover {
-            background-color: #ff6b81;
-            color: white;
+            padding: 0;
         }
 
-        /* 窗口内容 */
+        /* 内容区 */
         .tip-content {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px;
+            padding: 20px 15px;
             font-family: -apple-system, BlinkMacSystemFont, "微软雅黑", sans-serif;
             font-size: 16px;
             color: #333;
             text-align: center;
-            background-color: #fff;
         }
 
         @keyframes fadeOut {
-            0% { opacity: 1; transform: scale(0.8); }
-            10% { opacity: 1; transform: scale(1); }
-            90% { opacity: 1; }
-            100% { opacity: 0; transform: scale(0.9); }
+            0% { opacity: 0; transform: scale(0.8); }
+            15% { opacity: 1; transform: scale(1); }
+            85% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
-        /* 花瓣特效 */
+        /* 飘落花瓣 */
         .petal {
             position: fixed;
             top: -10px;
@@ -121,15 +111,22 @@
             '平安喜乐~', '被人惦记的感觉真好~', '愿你天天开心~'
         ];
 
+        // 文字框背景色（和视频里的彩色框一致）
+        const bgColors = [
+            '#fff0f5', '#f0f8ff', '#f5fffa', '#fffaf0',
+            '#f5f5dc', '#ffe4e1', '#e6e6fa', '#f0fff0'
+        ];
+
         const sw = window.innerWidth;
         const sh = window.innerHeight;
-        const windowWidth = 240;
+        const windowWidth = 260;
         const windowMinHeight = 100;
-        const totalWindows = 40; // 控制数量，手机上不拥挤
+        const totalWindows = 40;
 
-        // 创建窗口
+        // 创建文字框
         function createTipWindow() {
             const tip = tips[Math.floor(Math.random() * tips.length)];
+            const bg = bgColors[Math.floor(Math.random() * bgColors.length)];
             const x = Math.floor(Math.random() * (sw - windowWidth));
             const y = Math.floor(Math.random() * (sh - windowMinHeight));
 
@@ -137,8 +134,9 @@
             windowEl.className = 'tip-window';
             windowEl.style.left = `${x}px`;
             windowEl.style.top = `${y}px`;
+            windowEl.style.backgroundColor = bg;
 
-            // 标题栏
+            // 标题栏 + 关闭按钮
             const header = document.createElement('div');
             header.className = 'tip-header';
             header.innerHTML = `
@@ -161,10 +159,10 @@
             windowEl.appendChild(content);
             document.body.appendChild(windowEl);
 
-            // 15秒后自动消失
+            // 18秒后自动消失
             setTimeout(() => {
                 windowEl.remove();
-            }, 15000);
+            }, 18000);
         }
 
         // 飘落花瓣
@@ -177,7 +175,7 @@
             setTimeout(() => petal.remove(), 10000);
         }
 
-        // 开始生成窗口
+        // 开始生成文字框（节奏和视频一致）
         function startWarmTips() {
             let count = 0;
             const interval = setInterval(() => {
@@ -187,7 +185,7 @@
                 }
                 createTipWindow();
                 count++;
-            }, 250);
+            }, 300);
         }
 
         // 开始花瓣
@@ -195,7 +193,7 @@
             setInterval(createPetal, 400);
         }
 
-        // 触摸屏幕关闭所有窗口
+        // 触摸屏幕关闭所有窗口（手机适配）
         document.addEventListener('touchstart', (e) => {
             if (e.target.classList.contains('close-btn')) return;
             document.querySelectorAll('.tip-window').forEach(el => el.remove());
